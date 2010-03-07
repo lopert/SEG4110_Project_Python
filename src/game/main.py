@@ -36,25 +36,25 @@ if __name__ == '__main__':
             pygame.event.post(pygame.event.Event(pygame.QUIT))
                 
         for event in pygame.event.get():
-            if event.type == pygame.QUIT: sys.exit()       
+            if event.type == pygame.QUIT: sys.exit()
         
         if key[pygame.K_UP] and key[pygame.K_DOWN]:
             speed[1] = 0
         elif key[pygame.K_UP]:
-            speed[1] = -5
+            speed[1] -= 2
         elif key[pygame.K_DOWN]:
-            speed[1] = 5
-        else:
-            speed[1] = 0
+            speed[1] += 2
+        #else:
+        #    speed[1] = 0
             
         if key[pygame.K_LEFT] and key[pygame.K_RIGHT]:
             speed[0] = 0
         elif key[pygame.K_LEFT]:
-            speed[0] = -5
+            speed[0] -= 2
         elif key[pygame.K_RIGHT]:
-            speed[0] = 5
-        else:
-            speed[0] = 0
+            speed[0] += 2
+        #else:
+        #    speed[0] = 0
             
         speed[0] -= gravity[0]
         speed[1] -= gravity[1]       
