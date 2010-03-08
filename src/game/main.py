@@ -17,13 +17,19 @@ class Game:
 
         self.screen = pygame.display.set_mode(self.size, pygame.FULLSCREEN)
         
+        ''' the font for the score board '''
+        fontPath = pygame.font.match_font("Arial", True, False)
+        self.scoreFont = pygame.font.Font(fontPath, 30)       
+        
         ''' load the images '''
         self.background = pygame.image.load("3D_Hot_Planet.jpg")
         self.backgroundrect = self.background.get_rect()
 
         self.player = player.Player(pygame.image.load("player_ship_resized.png"))
         
-        self.alienUFOskin = pygame.image.load("ufo_resized.png");
+        self.alienUFOskin = pygame.image.load("ufo_resized.png")
+        
+        self.laser = pygame.image.load("laser.png")
         
         self.enemyone = enemy.Enemy(self.alienUFOskin, 43)
         self.enemytwo = enemy.Enemy(self.alienUFOskin, 20)
@@ -116,12 +122,15 @@ class Game:
         if (self.player.rect.collidelist(self.obstaclerects) != -1):
                 ''' death code '''
                 self.player.death()
-                print "Death"
+                self.playBigExplosionSound()                
                 
         ''' reset any obstacles that have gone by '''
         for o in self.obstacles:
             if o.rect.right < 0:
                 o.reset(self.width, self.height)
+                
+        ''' update the player score '''
+        self.player.score += 1
         
         
     def draw(self):
@@ -129,9 +138,19 @@ class Game:
         self.screen.fill(self.black)
         self.screen.blit(self.background, self.backgroundrect)
 
+        ''' draw the player '''
         self.screen.blit(self.player.img, self.player.rect)
+        
+        ''' draw the enemies '''
         for o in self.obstacles:
             self.screen.blit(o.img, o.rect)
+            
+        ''' draw the score '''
+        fontSurface = self.scoreFont.render("%d" % self.player.score, True, (255,255,0))
+        fontRect = fontSurface.get_rect()
+        fontRect.top = 0
+        fontRect.left = (self.width - fontRect.width) / 2
+        self.screen.blit(fontSurface, fontRect)
             
         pygame.display.flip() 
     
