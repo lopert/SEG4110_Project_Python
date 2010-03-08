@@ -4,38 +4,92 @@ Created on Mar 7, 2010
 @author: kmott071
 '''
 
-import sys, pygame, time\
+import sys, pygame, time
 
+class Game:
+    
+    def __init__(self):
+        pygame.init()
+
+        self.size = self.width, self.height = (1024, 768)
+        self.speed = [0, 0]
+        self.black = 0, 0, 0
+
+        self.screen = pygame.display.set_mode(self.size, pygame.FULLSCREEN)
+        
+        ''' load the images '''
+        self.background = pygame.image.load("3D_Hot_Planet.jpg")
+        self.backgroundrect = self.background.get_rect()
+
+        self.player = pygame.image.load("player_ship_resized.png")
+        self.playerrect = self.player.get_rect()
+    
+        self.enemy = pygame.image.load("ufo_resized.png");
+        self.enemyrect = self.enemy.get_rect()
+        
+        ''' mouvement directions '''
+        self.travelLeft = False
+        self.travelRight = False
+        self.travelUp = False
+        self.travelDown = False
+        
+    def handleKeyDownEvent(self, event):
+        ''' the arrow keys affect mouvement '''
+        if event.key == pygame.K_UP:
+            self.travelUp = True
+        elif event.key == pygame.K_DOWN:
+            self.travelDown = True
+        elif event.key == pygame.K_LEFT:
+            self.travelLeft = True
+        elif event.key == pygame.K_RIGHT:
+            self.travelRight = True
+            
+    def handleKeyUpEvent(self, event):
+        ''' the arrow keys affect mouvement ''' 
+        if event.key == pygame.K_UP:
+            self.travelUp = False
+        elif event.key == pygame.K_DOWN:
+            self.travelDown = False
+        elif event.key == pygame.K_LEFT:
+            self.travelLeft = False
+        elif event.key == pygame.K_RIGHT:
+            self.travelRight = False
+            
+    def update(self):
+        ''' adjust the speeds '''
+        if self.travelLeft:
+            self.speed[0] -= 2
+        if self.travelRight:
+            self.speed[0] += 2
+        if self.travelUp:
+            self.speed[1] -= 2
+        if self.travelDown:
+            self.speed[1] += 2
+        
+        ''' prevent the player from going off screen '''
+        if self.playerrect.top + self.speed[1] < 0:
+            self.speed[1] = 0
+        if self.playerrect.bottom + self.speed[1] > self.height:
+            self.speed[1] = 0
+        if self.playerrect.left + self.speed[0] < 0:
+            self.speed[0] = 0
+        if self.playerrect.right + self.speed[0] > self.width:
+            self.speed[0] = 0
+  
+        ''' move the player '''
+        self.playerrect = self.playerrect.move(self.speed)
+        
+    def draw(self):
+        ''' draw the scene '''
+        self.screen.fill(self.black)
+        self.screen.blit(self.background, self.backgroundrect)
+        self.screen.blit(self.player, self.playerrect)
+        self.screen.blit(self.enemy, self.enemyrect)
+        pygame.display.flip() 
+        
 
 if __name__ == '__main__':
-    print "Hello World"
-     
-    pygame.init()
-
-    size = width, height = 1024, 768
-    speed = [0, 0]
-    gravity = [0, 0]
-    black = 0, 0, 0
-
-    screen = pygame.display.set_mode(size, pygame.FULLSCREEN)
     
-    
-    background = pygame.image.load("3D_Hot_Planet.jpg")
-    backgroundrect = background.get_rect()
-
-    player = pygame.image.load("player_ship_resized.png")
-    playerrect = player.get_rect()
-    
-    enemy = pygame.image.load("ufo_resized.png");
-    enemyrect = enemy.get_rect()
-    enemyrect = enemyrect.move(500,500)
-    
-    thingsthatmove = []
-    thingsthatmove.append(enemy)
-    
-    thingsthatcankillyou = []
-    thingsthatcankillyou.append(enemyrect)
-
     while 1:
         key = pygame.key.get_pressed()
         
@@ -43,57 +97,14 @@ if __name__ == '__main__':
             pygame.event.post(pygame.event.Event(pygame.QUIT))
                 
         for event in pygame.event.get():
-            if event.type == pygame.QUIT: sys.exit()
-        
-        if key[pygame.K_UP] and key[pygame.K_DOWN]:
-            speed[1] = 0
-        elif key[pygame.K_UP]:
-            speed[1] -= 2
-        elif key[pygame.K_DOWN]:
-            speed[1] += 2
-        #else:
-        #    speed[1] = 0
-            
-        if key[pygame.K_LEFT] and key[pygame.K_RIGHT]:
-            speed[0] = 0
-        elif key[pygame.K_LEFT]:
-            speed[0] -= 2
-        elif key[pygame.K_RIGHT]:
-            speed[0] += 2
-        #else:
-        #    speed[0] = 0
-            
-        speed[0] -= gravity[0]
-        speed[1] -= gravity[1]       
-        
-        if playerrect.top + speed[1] < 0:
-            speed[1] = 0
-        if playerrect.bottom + speed[1] > height:
-            speed[1] = 0
-        if playerrect.left + speed[0] < 0:
-            speed[0] = 0
-        if playerrect.right + speed[0] > width:
-            speed[0] = 0
-  
-        playerrect = playerrect.move(speed)
-        
-        if (playerrect.collidelist(thingsthatcankillyou) != -1):
-            print "You dead!"
-            player.death()
-            speed[0] = 0
-            speed[1] = 0
-            playerrect.top = 0
-            playerrect.left = 0
-            
-        for thing in thingsthatmove:
-            thing.movement
-            thingrect = thing.get_rect()
-            if thingrect.left < 0 - thingrect.width:
-                thingrect.left = 1024 + thingrect.width
 
-        screen.fill(black)
-        screen.blit(background, backgroundrect)
-        screen.blit(player, playerrect)
-        screen.blit(enemy, enemyrect)
-        pygame.display.flip() 
+            if event.type == pygame.QUIT: 
+                sys.exit()
+            elif event.type == pygame.KEYDOWN:
+                game.handleKeyDownEvent(event)
+            elif event.type == pygame.KEYUP:
+                game.handleKeyUpEvent(event)
+
+        game.update()
+        game.draw()        
         time.sleep(0.01)       
