@@ -12,37 +12,33 @@ class Player:
     '''
 
 
-    def __init__(self):
+    def __init__(self, surface):
         '''
         Constructor
         '''
         self.highScore = 0;
-        self.playerImg = pygame.image.load("player.bmp")
-        self.playerRect = self.playerImg.get_rect()
+        self.img = surface
+        self.rect = self.img.get_rect()
         self.ySpeed = 0;
         self.xSpeed = 0;
         
-    def changeSpeed(self, direction, value):
-        if direction == "UP":
-            self.ySpeed -= value
-        elif direction == "DOWN":
-            self.ySpeed += value
-        elif direction == "LEFT":
-            self.xSpeed -= value
-        elif direction == "RIGHT":
-            self.xSpeed += value
+#    def changeSpeed(self, direction, value):
+#        if direction == "UP":
+#            self.ySpeed -= value
+#        elif direction == "DOWN":
+#            self.ySpeed += value
+#        elif direction == "LEFT":
+#            self.xSpeed -= value
+#        elif direction == "RIGHT":
+#            self.xSpeed += value
             
     def death(self):
+        self.rect.top = 0
+        self.rect.left = 0
+        self.xSpeed = 0
+        self.ySpeed = 0
         
-        
-#   def move(self, obstacles):
-#       
-#       self.playerRect.left += self.xSpeed
-#       
-#       if (self.playerRect.collidelist != -1):
-#           print "You dead!"
-#       
-#      
-#       if playerRect.bottom < deadlyObject.top:
-#           if playerRect.top 
-#           if playerRect.right > deadlyObject.left:
+    def movement(self):
+       
+       self.rect.left += self.xSpeed
+       self.rect.top += self.ySpeed

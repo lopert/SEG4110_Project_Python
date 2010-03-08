@@ -13,13 +13,13 @@ class Enemy(object):
     '''
 
 
-    def __init__(self, speed):
+    def __init__(self, surface, speed):
         '''
         Constructor
         '''
         
-        self.enemyImg = pygame.image.load("ufo_resized.png");
-        self.enemyRect = self.enemyImg.get_rect()
+        self.img = surface;
+        self.rect = self.img.get_rect()
         self.speed = speed
         
     def shootRandom(self):
@@ -28,8 +28,9 @@ class Enemy(object):
             
         
     def shoot(self):
+        print "Imma firin mah lazah!"
         #generate a bullet here
         
     def movement(self):
-        self.left = self.left - self.speed
+        self.rect.left = self.rect.left - self.speed
         

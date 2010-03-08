@@ -4,7 +4,7 @@ Created on Mar 7, 2010
 @author: kmott071
 '''
 
-import sys, pygame, time
+import sys, pygame, time, enemy, player
 
 class Game:
     
@@ -21,11 +21,22 @@ class Game:
         self.background = pygame.image.load("3D_Hot_Planet.jpg")
         self.backgroundrect = self.background.get_rect()
 
-        self.player = pygame.image.load("player_ship_resized.png")
-        self.playerrect = self.player.get_rect()
+        self.player = player.Player(pygame.image.load("player_ship_resized.png"))
+        
+        self.enemyone = enemy.Enemy(pygame.image.load("ufo_resized.png"), 5)
+        
+        self.obstacles = []
+        self.obstacles.append(self.enemyone)
+        
+        self.obstaclerects = []
+        for o in self.obstacles:
+            self.obstaclerects.append(o.rect)
+        
+        self.enemyone.rect.left = 500
+        self.enemyone.rect.top = 500
     
-        self.enemy = pygame.image.load("ufo_resized.png");
-        self.enemyrect = self.enemy.get_rect()
+        #self.enemy = ;
+        #self.enemyrect = self.enemy.get_rect()
         
         ''' mouvement directions '''
         self.travelLeft = False
@@ -58,37 +69,50 @@ class Game:
     def update(self):
         ''' adjust the speeds '''
         if self.travelLeft:
-            self.speed[0] -= 2
+            self.player.xSpeed -= 2
         if self.travelRight:
-            self.speed[0] += 2
+            self.player.xSpeed += 2
         if self.travelUp:
-            self.speed[1] -= 2
+            self.player.ySpeed -= 2
         if self.travelDown:
-            self.speed[1] += 2
+            self.player.ySpeed += 2
         
         ''' prevent the player from going off screen '''
-        if self.playerrect.top + self.speed[1] < 0:
-            self.speed[1] = 0
-        if self.playerrect.bottom + self.speed[1] > self.height:
-            self.speed[1] = 0
-        if self.playerrect.left + self.speed[0] < 0:
-            self.speed[0] = 0
-        if self.playerrect.right + self.speed[0] > self.width:
-            self.speed[0] = 0
+        if self.player.rect.top + self.player.ySpeed < 0:
+            self.player.ySpeed = 0
+        if self.player.rect.bottom + self.player.ySpeed > self.height:
+            self.player.ySpeed = 0
+        if self.player.rect.left + self.player.xSpeed < 0:
+            self.player.xSpeed = 0
+        if self.player.rect.right + self.player.xSpeed > self.width:
+            self.player.xSpeed = 0
   
         ''' move the player '''
-        self.playerrect = self.playerrect.move(self.speed)
+        self.player.movement()
+        
+        ''' move all obstacles their respective speeds and paths '''
+        for o in self.obstacles:
+            o.movement()
+        
+        ''' check for collisions '''
+        if (self.player.rect.collidelist(self.obstaclerects) != -1):
+                ''' death code '''
+                self.player.death()
+                print "Death"
+        
         
     def draw(self):
         ''' draw the scene '''
         self.screen.fill(self.black)
         self.screen.blit(self.background, self.backgroundrect)
-        self.screen.blit(self.player, self.playerrect)
-        self.screen.blit(self.enemy, self.enemyrect)
+        self.screen.blit(self.player.img, self.player.rect)
+        self.screen.blit(self.enemyone.img, self.enemyone.rect)
         pygame.display.flip() 
         
 
 if __name__ == '__main__':
+    
+    game = Game()
     
     while 1:
         key = pygame.key.get_pressed()
@@ -107,4 +131,6 @@ if __name__ == '__main__':
 
         game.update()
         game.draw()        
-        time.sleep(0.01)       
+        time.sleep(0.01)
+        
+    print "Done"       
