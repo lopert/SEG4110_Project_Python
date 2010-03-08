@@ -14,21 +14,24 @@ class Game:
         self.size = self.width, self.height = (1024, 768)
         self.speed = [0, 0]
         self.black = 0, 0, 0
+        
+        self.gameStarted = False
 
         self.screen = pygame.display.set_mode(self.size, pygame.FULLSCREEN)
         
         ''' the font for the score board '''
         fontPath = pygame.font.match_font("Arial", True, False)
-        self.scoreFont = pygame.font.Font(fontPath, 30)       
+        self.scoreFont = pygame.font.Font(fontPath, 30)
+        
+        ''' the font for the click to start '''
+        self.titleFont = pygame.font.Font(fontPath, 50)
+        self.clickToStartFont = pygame.font.Font(fontPath, 20)      
         
         ''' load the images '''
         self.background = pygame.image.load("3D_Hot_Planet.jpg")
         self.backgroundrect = self.background.get_rect()
-
         self.player = player.Player(pygame.image.load("player_ship_resized.png"))
-        
         self.alienUFOskin = pygame.image.load("ufo_resized.png")
-        
         self.laser = pygame.image.load("laser.png")
         
         self.enemyone = enemy.Enemy(self.alienUFOskin, 43)
@@ -88,9 +91,18 @@ class Game:
             self.travelRight = False
         elif event.key == pygame.K_SPACE:
             self.shooting = False
+            
+    def handleMouseDownEvent(self, event):
+        if event.button == 1:
+            if not self.gameStarted:
+                self.gameStarted = True
         
             
-    def update(self):       
+    def update(self):
+        ''' don't do anything if the game is not started '''
+        if not self.gameStarted:
+            return
+               
         ''' adjust the speeds '''
         if self.travelLeft:
             self.player.xSpeed -= 2
@@ -134,9 +146,30 @@ class Game:
         
         
     def draw(self):
-        ''' draw the scene '''
+        ''' draw the background '''
         self.screen.fill(self.black)
         self.screen.blit(self.background, self.backgroundrect)
+        
+        
+        if not self.gameStarted:
+            ''' only draw the click to start screen if the game is not started '''
+            ''' draw the title '''
+            surfaceTitleFont = self.titleFont.render("Paradox", True, (255,255,0))
+            titleRect = surfaceTitleFont.get_rect()
+            titleRect.top = (self.height - titleRect.height) / 2
+            titleRect.left = (self.width - titleRect.width) / 2
+            self.screen.blit(surfaceTitleFont, titleRect)
+            
+            ''' draw the click to start message '''
+            surfaceClickToStart = self.clickToStartFont.render("Click to start", True, (255,255,0))
+            clickRect = surfaceClickToStart.get_rect()
+            clickRect.top = titleRect.bottom + 20
+            clickRect.left = (self.width - clickRect.width) / 2
+            self.screen.blit(surfaceClickToStart, clickRect)
+            
+            ''' update the screen '''
+            pygame.display.flip() 
+            return
 
         ''' draw the player '''
         self.screen.blit(self.player.img, self.player.rect)
@@ -197,16 +230,16 @@ if __name__ == '__main__':
             pygame.event.post(pygame.event.Event(pygame.QUIT))
                 
         for event in pygame.event.get():
-
             if event.type == pygame.QUIT: 
                 sys.exit()
             elif event.type == pygame.KEYDOWN:
                 game.handleKeyDownEvent(event)
             elif event.type == pygame.KEYUP:
                 game.handleKeyUpEvent(event)
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                game.handleMouseDownEvent(event)
 
         game.update()
         game.draw()        
         time.sleep(0.01)
-        
-    print "Done"       
+               
