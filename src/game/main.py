@@ -4,7 +4,7 @@ Created on Mar 7, 2010
 @author: kmott071
 '''
 
-import sys, pygame, time, enemy, player
+import sys, pygame, time, enemy, player, bullet
 
 class Game:
     
@@ -25,16 +25,27 @@ class Game:
         
         self.alienUFOskin = pygame.image.load("ufo_resized.png");
         
-        self.enemyone = enemy.Enemy(self.alienUFOskin, 43)
-        self.enemytwo = enemy.Enemy(self.alienUFOskin, 20)
-        self.enemythree = enemy.Enemy(self.alienUFOskin, 36)
+        ''' Generate bullets '''
+        self.bulletlist = []
+        for i in range(20):
+            self.bulletlist.append(bullet.Bullet(0))
         
-        self.obstacles = []
-        self.obstacles.append(self.enemyone)
-        self.obstacles.append(self.enemytwo)
-        self.obstacles.append(self.enemythree)
+        ''' Generate Enemies '''
+        self.enemylist = []
+        self.enemylist.append(enemy.Enemy(self.alienUFOskin, 43))
+        self.enemylist.append(enemy.Enemy(self.alienUFOskin, 20))
+        self.enemylist.append(enemy.Enemy(self.alienUFOskin, 36))
         
-        self.obstaclerects = []
+        self.enemyrectlist = []
+        for e in self.enemylist:
+            self.enemyrectlist.append(e.rect)
+        
+        ''' What can the player be killed by? '''
+        self.obstaclelist = []        
+        for e in self.enemy:
+            self.obstacles.append(e)
+        
+        self.obstaclerectlist = []
         for o in self.obstacles:
             self.obstaclerects.append(o.rect)
         
@@ -117,6 +128,12 @@ class Game:
                 ''' death code '''
                 self.player.death()
                 print "Death"
+        
+        for e in self.enemylist:
+            if e.rect.collidelist(self.bulletlist):
+                ''' enemy death code '''
+                e.reset()
+                self.playExplosionSound()
                 
         ''' reset any obstacles that have gone by '''
         for o in self.obstacles:

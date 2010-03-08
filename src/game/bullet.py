@@ -11,20 +11,15 @@ class Bullet:
     '''
 
 
-    def __init__(self, velocity, direction):
+    def __init__(self, velocity):
         '''
         Constructor
         '''
-        self.bulletImg = pygame.image.load("player.bmp")
-        self.bulletRect = self.bulletImg.get_rect()
+        self.img = pygame.image.load("player.bmp")
+        self.rect = self.img.get_rect()
         self.velocity = velocity
-        self.direction = direction
         
-    def move(self):
-        if (self.direction == "LEFT"):
-            self.bulletRect.left -= self.velocity
-            
-        elif (self.direction == "RIGHT"):
-            self.bulletRect.left += self.velocity 
+    def movement(self):
+        self.rect.left += velocity 
         
         
