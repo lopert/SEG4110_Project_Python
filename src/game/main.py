@@ -28,6 +28,13 @@ if __name__ == '__main__':
     
     enemy = pygame.image.load("ufo_resized.png");
     enemyrect = enemy.get_rect()
+    enemyrect = enemyrect.move(500,500)
+    
+    thingsthatmove = []
+    thingsthatmove.append(enemy)
+    
+    thingsthatcankillyou = []
+    thingsthatcankillyou.append(enemyrect)
 
     while 1:
         key = pygame.key.get_pressed()
@@ -69,6 +76,20 @@ if __name__ == '__main__':
             speed[0] = 0
   
         playerrect = playerrect.move(speed)
+        
+        if (playerrect.collidelist(thingsthatcankillyou) != -1):
+            print "You dead!"
+            player.death()
+            speed[0] = 0
+            speed[1] = 0
+            playerrect.top = 0
+            playerrect.left = 0
+            
+        for thing in thingsthatmove:
+            thing.movement
+            thingrect = thing.get_rect()
+            if thingrect.left < 0 - thingrect.width:
+                thingrect.left = 1024 + thingrect.width
 
         screen.fill(black)
         screen.blit(background, backgroundrect)

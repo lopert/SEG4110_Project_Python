@@ -17,4 +17,5 @@ class Cube:
         '''
         self.cubeImg = pygame.image.load("player.bmp")
         self.cubeRect = self.cubeImg.get_rect()
+        self.speed = 2
         

@@ -31,6 +31,9 @@ class Player:
             self.xSpeed -= value
         elif direction == "RIGHT":
             self.xSpeed += value
+            
+    def death(self):
+        
         
 #   def move(self, obstacles):
 #       
