@@ -23,29 +23,29 @@ class Game:
 
         self.player = player.Player(pygame.image.load("player_ship_resized.png"))
         
-        self.enemyone = enemy.Enemy(pygame.image.load("ufo_resized.png"), 5)
+        self.alienUFOskin = pygame.image.load("ufo_resized.png");
+        
+        self.enemyone = enemy.Enemy(self.alienUFOskin, 43)
+        self.enemytwo = enemy.Enemy(self.alienUFOskin, 20)
+        self.enemythree = enemy.Enemy(self.alienUFOskin, 36)
         
         self.obstacles = []
         self.obstacles.append(self.enemyone)
+        self.obstacles.append(self.enemytwo)
+        self.obstacles.append(self.enemythree)
         
         self.obstaclerects = []
         for o in self.obstacles:
             self.obstaclerects.append(o.rect)
         
-        self.enemyone.rect.left = 500
-        self.enemyone.rect.top = 500
-    
-        #self.enemy = ;
-        #self.enemyrect = self.enemy.get_rect()
-        
-        ''' mouvement directions '''
+        ''' movement directions '''
         self.travelLeft = False
         self.travelRight = False
         self.travelUp = False
         self.travelDown = False
         
     def handleKeyDownEvent(self, event):
-        ''' the arrow keys affect mouvement '''
+        ''' the arrow keys affect movement '''
         if event.key == pygame.K_UP:
             self.travelUp = True
         elif event.key == pygame.K_DOWN:
@@ -56,7 +56,7 @@ class Game:
             self.travelRight = True
             
     def handleKeyUpEvent(self, event):
-        ''' the arrow keys affect mouvement ''' 
+        ''' the arrow keys affect movement ''' 
         if event.key == pygame.K_UP:
             self.travelUp = False
         elif event.key == pygame.K_DOWN:
@@ -99,6 +99,11 @@ class Game:
                 ''' death code '''
                 self.player.death()
                 print "Death"
+                
+        ''' reset any obstacles that have gone by '''
+        for o in self.obstacles:
+            if o.rect.right < 0:
+                o.reset(self.width, self.height)
         
         
     def draw(self):
@@ -106,7 +111,9 @@ class Game:
         self.screen.fill(self.black)
         self.screen.blit(self.background, self.backgroundrect)
         self.screen.blit(self.player.img, self.player.rect)
-        self.screen.blit(self.enemyone.img, self.enemyone.rect)
+        for o in self.obstacles:
+            self.screen.blit(o.img, o.rect)
+            
         pygame.display.flip() 
         
 

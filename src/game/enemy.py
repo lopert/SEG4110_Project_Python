@@ -34,3 +34,7 @@ class Enemy(object):
     def movement(self):
         self.rect.left = self.rect.left - self.speed
         
+    def reset(self, screenwidth, screenheight):
+        self.rect.left = screenwidth + (self.rect.width * random.randint(1,4))
+        self.rect.top = self.rect.height * random.randint(0, screenheight % self.rect.height) 
+        

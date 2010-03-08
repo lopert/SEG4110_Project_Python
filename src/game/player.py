@@ -19,6 +19,7 @@ class Player:
         self.highScore = 0;
         self.img = surface
         self.rect = self.img.get_rect()
+        self.rect.right = -1;
         self.ySpeed = 0;
         self.xSpeed = 0;
         
