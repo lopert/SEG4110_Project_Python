@@ -27,11 +27,24 @@ class Game:
         self.enemy = pygame.image.load("ufo_resized.png");
         self.enemyrect = self.enemy.get_rect()
         
-        ''' mouvement directions '''
+        ''' load the sounds '''
+        pygame.mixer.init()
+        self.afterburnSound = pygame.mixer.Sound("../../sounds/afterburn.ogg")
+        self.bigExplosionSound = pygame.mixer.Sound("../../sounds/big_explosion.ogg")
+        self.explosionSound = pygame.mixer.Sound("../../sounds/explosion.ogg")
+        self.gameOverSound = pygame.mixer.Sound("../../sounds/game_over.ogg")
+        self.pewSound = pygame.mixer.Sound("../../sounds/pew.ogg")
+        self.powSound = pygame.mixer.Sound("../../sounds/pow.ogg")
+        self.tinkSound = pygame.mixer.Sound("../../sounds/tink.ogg")
+        self.tuckSound = pygame.mixer.Sound("../../sounds/tink.ogg")
+        
+        ''' movement directions '''
         self.travelLeft = False
         self.travelRight = False
         self.travelUp = False
         self.travelDown = False
+        
+        self.shooting = False     
         
     def handleKeyDownEvent(self, event):
         ''' the arrow keys affect mouvement '''
@@ -43,6 +56,8 @@ class Game:
             self.travelLeft = True
         elif event.key == pygame.K_RIGHT:
             self.travelRight = True
+        elif event.key == pygame.K_SPACE:
+            self.shooting = True
             
     def handleKeyUpEvent(self, event):
         ''' the arrow keys affect mouvement ''' 
@@ -54,8 +69,11 @@ class Game:
             self.travelLeft = False
         elif event.key == pygame.K_RIGHT:
             self.travelRight = False
+        elif event.key == pygame.K_SPACE:
+            self.shooting = False
+        
             
-    def update(self):
+    def update(self):       
         ''' adjust the speeds '''
         if self.travelLeft:
             self.speed[0] -= 2
@@ -85,8 +103,39 @@ class Game:
         self.screen.blit(self.background, self.backgroundrect)
         self.screen.blit(self.player, self.playerrect)
         self.screen.blit(self.enemy, self.enemyrect)
-        pygame.display.flip() 
+        pygame.display.flip()
+    
+    def playAfterburnSound(self):
+        ''' play the afterburn sound '''
+        self.afterburnSound.play()
         
+    def playBigExplosionSound(self):
+        ''' play the big explosion sound '''
+        self.bigExplosionSound.play()
+        
+    def playExplosionSound(self):
+        ''' play the explosion sound '''
+        self.explosionSound.play()
+        
+    def playGameOverSound(self):
+        ''' play the game over sound '''
+        self.gameOverSound.play()
+        
+    def playPewSound(self):
+        ''' play the pew sound '''
+        self.pewSound.play()    
+    
+    def playPowSound(self):
+        ''' play the pow sound '''
+        self.powSound.play()
+        
+    def playTinkSound(self):
+        ''' play the tink sound '''
+        self.tinkSound.play()
+        
+    def playTuckSound(self):
+        ''' play the tuck sound '''
+        self.tuckSound.play()  
 
 if __name__ == '__main__':
     
