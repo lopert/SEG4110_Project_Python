@@ -47,11 +47,11 @@ class Game:
         self.playeractivebulletlist = []
         self.enemyactivebulletlist = []
         
-        self.playerbulletskin = pygame.image.load("laser.png")
+        self.playerbulletskin = self.laser
         for i in range(50):
-            self.playerreservebulletlist.append(bullet.Bullet(self.playerbulletskin))
-            
-        self.enemybulletskin = pygame.image.load("laser_ball.png")
+        self.playerreservebulletlist.append(bullet.Bullet(self.playerbulletskin))
+        
+        self.enemybulletskin = self.laserBall
         for i in range(50):
             self.enemyreservebulletlist.append(bullet.Bullet(self.enemybulletskin))
             
@@ -177,14 +177,14 @@ class Game:
                 self.player.death()
                 self.__doPlayerDeathAnimation()
         
+        bulletstoreserve = []
         for e in self.enemylist:
             for b in self.playeractivebulletlist:
                 if (e.rect.colliderect(b.rect)):
                     ''' enemy death code '''
                     e.reset(self.width, self.height)
                     b.reset(self.width, self.height)
-                    self.playerreservebulletlist.append(b)
-                    self.playeractivebulletlist.remove(b)
+                    bulletstoreserve.append(b)                    
                     self.playExplosionSound()
                     self.player.score += 50
                 
@@ -195,15 +195,23 @@ class Game:
                 
         for b in self.playeractivebulletlist:
             if (b.rect.left > self.width):
-                self.playerreservebulletlist.append(b)
-                self.playeractivebulletlist.remove(b)
+                bulletstoreserve.append(b) 
                 b.reset(self.width, self.height)
+                
+        for b in bulletstoreserve:
+            self.playerreservebulletlist.append(b)
+            self.playeractivebulletlist.remove(b)
+        
+        bulletstoreserve = []
         
         for b in self.enemyactivebulletlist:
             if (b.rect.right < 0):
-                self.enemyreservebulletlist.append(b)
-                self.enemyactivebulletlist.remove(b)
+                bulletstoreserve.append(b)                
                 b.reset(self.width, self.height)
+
+        for b in bulletstoreserve:
+            self.enemyreservebulletlist.append(b)
+            self.enemyactivebulletlist.remove(b)
                 
         ''' check if shooting '''
         if self.shooting:
@@ -367,15 +375,28 @@ class Game:
         for e in self.enemylist:
             e.reset(self.width, self.height)
             
+        playerbulletstoreserve = []
+        enemybulletstoreserve = []
+            
         for b in self.playeractivebulletlist:
-            b.reset(self.width, self.height)
-            self.playerreservebulletlist.append(b)
-            self.playeractivebulletlist.remove(b)
+            playerbulletstoreserve.append(b)
             
         for b in self.enemyactivebulletlist:
-            b.reset(self.width, self.height)
+            enemybulletstoreserve.append(b)
+            
+        for b in playerbulletstoreserve:    
+            self.playerreservebulletlist.append(b)
+            self.playeractivebulletlist.remove(b)
+        
+        for b in enemybulletstoreserve:
             self.enemyreservebulletlist.append(b)
             self.enemyactivebulletlist.remove(b)
+            
+        for b in self.playerreservebulletlist:
+            b.reset(self.width, self.height)
+            
+        for b in self.enemyreservebulletlist:
+            b.reset(self.width, self.height)
             
         self.player.reset()
           
