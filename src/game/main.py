@@ -4,7 +4,7 @@ Created on Mar 7, 2010
 @author: kmott071
 '''
 
-import sys, pygame, time, enemy, player, bullet
+import sys, pygame, time, enemy, player, bullet, random
 
 class Game:
     
@@ -33,6 +33,7 @@ class Game:
         self.player = player.Player(pygame.image.load("player_ship_resized.png"))
         self.alienUFOskin = pygame.image.load("ufo_resized.png")
         self.laser = pygame.image.load("laser.png")
+        self.laserBall = pygame.image.load("laser_ball.png")
         self.fire = pygame.image.load("cartoon_fire_resized.png")
         
         ''' Generate bullets '''
@@ -151,7 +152,7 @@ class Game:
         if (self.player.rect.collidelist(self.obstaclerectlist) != -1):
                 ''' death code '''
                 self.player.death()
-                self.playBigExplosionSound()
+                self.__doPlayerDeathAnimation()
         
         for e in self.enemylist:
             for b in self.activebulletlist:
@@ -233,7 +234,27 @@ class Game:
         fontRect.left = (self.width - fontRect.width) / 2
         self.screen.blit(fontSurface, fontRect)
             
-        pygame.display.flip() 
+        pygame.display.flip()
+        
+    def __doPlayerDeathAnimation(self):
+        
+        self.playBigExplosionSound()
+        
+        ''' generate a bunch of fires on the screen '''
+        for _ in range(20):
+            fireRect = self.fire.get_rect()
+            fireRect.left = self.player.rect.left - fireRect.width / 2 + random.randint(0, self.player.rect.width)
+            fireRect.top = self.player.rect.top - random.randint(0, self.player.rect.height)  
+            self.screen.blit(self.fire, fireRect)
+            pygame.display.flip()
+            time.sleep(0.2)
+            
+        self.playGameOverSound()
+                
+        self.__reset()
+        self.gameStarted = False
+        self.gameOver = True
+         
     
     def playAfterburnSound(self):
         ''' play the afterburn sound '''

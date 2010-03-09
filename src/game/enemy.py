@@ -20,6 +20,7 @@ class Enemy(object):
         
         self.img = surface;
         self.rect = self.img.get_rect()
+        self.rect.left = -5000
         self.speed = speed
         
     def shootRandom(self):

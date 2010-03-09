@@ -18,8 +18,7 @@ class Player:
         '''
         self.score = 0;
         self.img = surface
-        self.rect = self.img.get_rect()
-        self.rect.right = -1;
+        self.rect = self.img.get_rect()        
         self.ySpeed = 0;
         self.xSpeed = 0;
         
@@ -34,8 +33,6 @@ class Player:
 #            self.xSpeed += value
             
     def death(self):
-        self.rect.top = 0
-        self.rect.left = 0
         self.xSpeed = 0
         self.ySpeed = 0
         
