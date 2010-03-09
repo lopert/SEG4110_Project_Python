@@ -53,12 +53,8 @@ class Game:
             self.playerreservebulletlist.append(bullet.Bullet(self.playerbulletskin))
         
         self.enemybulletskin = self.laserBall
-        for i in range(50):
+        for i in range(100):
             self.enemyreservebulletlist.append(bullet.Bullet(self.enemybulletskin))
-            
-        ''' Generate enemy bullets '''
-            
-        
         
         ''' Generate Enemies '''
         self.enemylist = []
@@ -250,6 +246,7 @@ class Game:
                 bullet.rect.right = e.rect.left
                 bullet.rect.top = e.rect.top + (e.rect.height / 2)
                 bullet.xvelocity = -25
+                bullet.yvelocity = random.randint(-10,10)
                 self.playPowSound()
             
                 
