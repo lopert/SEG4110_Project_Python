@@ -23,24 +23,27 @@ class Game:
         fontPath = pygame.font.match_font("Arial", True, False)
         self.scoreFont = pygame.font.Font(fontPath, 30)
         
-        ''' the font for the click to start '''
+        ''' the font for the hit space to start '''
         self.titleFont = pygame.font.Font(fontPath, 120)
-        self.clickToStartFont = pygame.font.Font(fontPath, 40)
+        self.spaceToStartFont = pygame.font.Font(fontPath, 40)
         
         ''' the font for game over '''
         self.gameOverFont = pygame.font.Font(fontPath, 120)
         self.gameOverScoreFont = pygame.font.Font(fontPath, 60)
-        self.gameOverClickForMainMenu = pygame.font.Font(fontPath, 40)      
+        self.gameOverSpaceForMainMenu = pygame.font.Font(fontPath, 40)      
         
         ''' load the images '''
         self.background = pygame.image.load("3D_Hot_Planet.jpg")
         self.backgroundrect = self.background.get_rect()
-        self.player = player.Player(pygame.image.load("player_ship_resized.png"))
+        self.playerImage = pygame.image.load("player_ship_resized.png")
         self.alienUFOskin = pygame.image.load("ufo_resized.png")
         self.laser = pygame.image.load("laser.png")
         self.laserBall = pygame.image.load("laser_ball.png")
         self.fire = pygame.image.load("cartoon_fire_resized.png")
         self.afterburnSurface = pygame.image.load("afterburn.png")
+
+        ''' the player's ship '''
+        self.player = player.Player(self.playerImage)
 
         ''' Generate bullets '''
         self.playerreservebulletlist = []
@@ -48,12 +51,14 @@ class Game:
         self.playeractivebulletlist = []
         self.enemyactivebulletlist = []
         
+        ''' add bullets to the players reserve '''
         self.playerbulletskin = self.laser
-        for i in range(50):
+        for _ in range(50):
             self.playerreservebulletlist.append(bullet.Bullet(self.playerbulletskin))
         
+        ''' add bullets to the enemies reserve '''
         self.enemybulletskin = self.laserBall
-        for i in range(100):
+        for _ in range(100):
             self.enemyreservebulletlist.append(bullet.Bullet(self.enemybulletskin))
         
         ''' Generate Enemies '''
@@ -62,15 +67,17 @@ class Game:
         self.enemylist.append(enemy.Enemy(self.alienUFOskin, 15))
         self.enemylist.append(enemy.Enemy(self.alienUFOskin, 12))
         
+        ''' add the enemies to the list of enemies ''' 
         self.enemyrectlist = []
         for e in self.enemylist:
             self.enemyrectlist.append(e.rect)
         
-        ''' What can the player be killed by? '''
+        ''' add the enemies to the list of obstacles '''
         self.obstaclelist = []        
         for e in self.enemylist:
             self.obstaclelist.append(e)
         
+        ''' create a list of the rectangles of the obstacles '''
         self.obstaclerectlist = []
         for o in self.obstaclelist:
             self.obstaclerectlist.append(o.rect)
@@ -110,7 +117,13 @@ class Game:
         elif event.key == pygame.K_RIGHT:
             self.travelRight = True
         elif event.key == pygame.K_SPACE:
-            self.shooting = True
+            if self.gameOver:
+                self.gameOver = False
+                self.__reset()                
+            elif not self.gameStarted:
+                self.gameStarted = True                
+            else:
+                self.shooting = True
         elif event.key == pygame.K_LALT:
             if not self.afterburn:
                 self.afterburn = True
@@ -130,17 +143,7 @@ class Game:
             self.shooting = False
         elif event.key == pygame.K_LALT:
             self.afterburn = False
-            
-    def handleMouseDownEvent(self, event):
-        if event.button == 1:
-            if self.gameOver:
-                self.gameOver = False
-                self.__reset()
-                return
-            if not self.gameStarted:
-                self.gameStarted = True
-                return
-        
+       
             
     def update(self):
         ''' don't do anything if the game is not started '''
@@ -272,11 +275,11 @@ class Game:
             gameOverScoreRect.left = (self.width - gameOverScoreRect.width) / 2
             self.screen.blit(surfaceGameOverScoreFont, gameOverScoreRect)
             
-            surfaceGameOverClickFont = self.gameOverClickForMainMenu.render("Click to return to main menu", True, (255,255,0))
-            gameOverClickRect = surfaceGameOverClickFont.get_rect()
-            gameOverClickRect.top = gameOverScoreRect.bottom + 20
-            gameOverClickRect.left = (self.width - gameOverClickRect.width) / 2
-            self.screen.blit(surfaceGameOverClickFont, gameOverClickRect)
+            surfaceGameOverSpaceFont = self.gameOverSpaceForMainMenu.render("Hit Space to return to main menu", True, (255,255,0))
+            gameOverSpaceRect = surfaceGameOverSpaceFont.get_rect()
+            gameOverSpaceRect.top = gameOverScoreRect.bottom + 20
+            gameOverSpaceRect.left = (self.width - gameOverSpaceRect.width) / 2
+            self.screen.blit(surfaceGameOverSpaceFont, gameOverSpaceRect)
             
             pygame.display.flip()
             return
@@ -291,11 +294,11 @@ class Game:
             self.screen.blit(surfaceTitleFont, titleRect)
             
             ''' draw the click to start message '''
-            surfaceClickToStart = self.clickToStartFont.render("Click to start", True, (255,255,0))
-            clickRect = surfaceClickToStart.get_rect()
-            clickRect.top = titleRect.bottom + 20
-            clickRect.left = (self.width - clickRect.width) / 2
-            self.screen.blit(surfaceClickToStart, clickRect)
+            surfaceSpaceToStart = self.spaceToStartFont.render("Hit Space to start", True, (255,255,0))
+            spaceRect = surfaceSpaceToStart.get_rect()
+            spaceRect.top = titleRect.bottom + 20
+            spaceRect.left = (self.width - spaceRect.width) / 2
+            self.screen.blit(surfaceSpaceToStart, spaceRect)
             
             ''' update the screen '''
             pygame.display.flip() 
@@ -439,8 +442,6 @@ if __name__ == '__main__':
                 game.handleKeyDownEvent(event)
             elif event.type == pygame.KEYUP:
                 game.handleKeyUpEvent(event)
-            elif event.type == pygame.MOUSEBUTTONDOWN:
-                game.handleMouseDownEvent(event)
 
         game.update()
         game.draw()        
