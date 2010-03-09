@@ -17,14 +17,18 @@ class Bullet:
         '''
         self.img = surface
         self.rect = self.img.get_rect()
-        self.velocity = 0
+        self.xvelocity = 0
+        self.yvelocity = 0
         self.rect.top = 6000
         
     def movement(self):
-        self.rect.left += self.velocity 
+        self.rect.left += self.xvelocity
+        self.rect.top += self.yvelocity  
         
-    def reset(self):
-        velocity = 0
-        self.rect.top = 6000
+    def reset(self, screenwidth, screenheight):
+        xvelocity = 0
+        yvelocity = 0
+        self.rect.top = screenheight * 3
+        self.rect.left = screenwidth / 2
         
         

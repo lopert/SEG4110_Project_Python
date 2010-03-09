@@ -36,18 +36,31 @@ class Game:
         self.laserBall = pygame.image.load("laser_ball.png")
         self.fire = pygame.image.load("cartoon_fire_resized.png")
         
+        
+        
         ''' Generate bullets '''
-        self.reservebulletlist = []
-        self.activebulletlist = []
-        self.bulletskin = pygame.image.load("laser.png")
-        for i in range(100):
-            self.reservebulletlist.append(bullet.Bullet(self.bulletskin))
+        self.playerreservebulletlist = []
+        self.enemyreservebulletlist = []
+        self.playeractivebulletlist = []
+        self.enemyactivebulletlist = []
+        
+        self.playerbulletskin = pygame.image.load("laser.png")
+        for i in range(50):
+            self.playerreservebulletlist.append(bullet.Bullet(self.playerbulletskin))
+            
+        self.playerbulletskin = pygame.image.load("laser.png")
+        for i in range(50):
+            self.enemyreservebulletlist.append(bullet.Bullet(self.playerbulletskin))
+            
+        ''' Generate enemy bullets '''
+            
+        
         
         ''' Generate Enemies '''
         self.enemylist = []
-        self.enemylist.append(enemy.Enemy(self.alienUFOskin, 43))
+        self.enemylist.append(enemy.Enemy(self.alienUFOskin, 26))
         self.enemylist.append(enemy.Enemy(self.alienUFOskin, 20))
-        self.enemylist.append(enemy.Enemy(self.alienUFOskin, 36))
+        self.enemylist.append(enemy.Enemy(self.alienUFOskin, 16))
         
         self.enemyrectlist = []
         for e in self.enemylist:
@@ -141,50 +154,71 @@ class Game:
         ''' move the player '''
         self.player.movement()
         
-        ''' move all obstaclelist their respective speeds and paths '''
+        ''' move all obstacles their respective speeds and paths '''
         for o in self.obstaclelist:
             o.movement()
             
-        for b in self.activebulletlist:
+        for b in self.playeractivebulletlist:
+            b.movement()
+            
+        for b in self.enemyactivebulletlist:
             b.movement()
         
         ''' check for collisions '''
-        if (self.player.rect.collidelist(self.obstaclerectlist) != -1):
+        if ((self.player.rect.collidelist(self.obstaclerectlist) != -1) or (self.player.rect.collidelist(self.enemyactivebulletlist) != -1)):
                 ''' death code '''
                 self.player.death()
                 self.__doPlayerDeathAnimation()
         
         for e in self.enemylist:
-            for b in self.activebulletlist:
+            for b in self.playeractivebulletlist:
                 if (e.rect.colliderect(b.rect)):
                     ''' enemy death code '''
                     e.reset(self.width, self.height)
-                    b.reset()
-                    self.reservebulletlist.append(b)
-                    self.activebulletlist.remove(b)
+                    b.reset(self.width, self.height)
+                    self.playerreservebulletlist.append(b)
+                    self.playeractivebulletlist.remove(b)
                     self.playExplosionSound()
+                    self.player.score += 50
                 
         ''' reset any obstaclelist that have gone by '''
         for o in self.obstaclelist:
             if o.rect.right < 0:
                 o.reset(self.width, self.height)
                 
-        for b in self.activebulletlist:
-            if b.rect.left > self.width:
-                self.reservebulletlist.append(b)
-                self.activebulletlist.remove(b)
-                b.reset()
+        for b in self.playeractivebulletlist:
+            if (b.rect.left > self.width):
+                self.playerreservebulletlist.append(b)
+                self.playeractivebulletlist.remove(b)
+                b.reset(self.width, self.height)
+        
+        for b in self.enemyactivebulletlist:
+            if (b.rect.right < 0):
+                self.enemyreservebulletlist.append(b)
+                self.enemyactivebulletlist.remove(b)
+                b.reset(self.width, self.height)
                 
         ''' check if shooting '''
         if self.shooting:
             
-            bullet = self.reservebulletlist.pop(0)
-            self.activebulletlist.append(bullet)
+            bullet = self.playerreservebulletlist.pop(0)
+            self.playeractivebulletlist.append(bullet)
             bullet.rect.left = self.player.rect.right
             bullet.rect.top = self.player.rect.top + (self.player.rect.height / 2)
-            bullet.velocity = 30
+            bullet.xvelocity = 35
             self.playPewSound()
             self.shooting = False
+            
+        ''' make enemies fire '''
+        for e in self.enemylist:
+            shoot = random.randint(1, 50)
+            if (shoot == 1):
+                bullet = self.enemyreservebulletlist.pop(0)
+                self.enemyactivebulletlist.append(bullet)
+                bullet.rect.right = e.rect.left
+                bullet.rect.top = e.rect.top + (e.rect.height / 2)
+                bullet.xvelocity = -35
+                self.playPowSound()
             
                 
         ''' update the player score '''
@@ -217,7 +251,10 @@ class Game:
             return
         
         ''' draw the bullets '''
-        for b in self.activebulletlist:
+        for b in self.playeractivebulletlist:
+            self.screen.blit(b.img, b.rect)
+            
+        for b in self.enemyactivebulletlist:
             self.screen.blit(b.img, b.rect)
 
         ''' draw the player '''
