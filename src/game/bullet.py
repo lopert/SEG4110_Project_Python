@@ -22,12 +22,14 @@ class Bullet:
         self.rect.top = 6000
         
     def movement(self):
+        ''' move the bullet's rectangle '''
         self.rect.left += self.xvelocity
         self.rect.top += self.yvelocity  
         
     def reset(self, screenwidth, screenheight):
-        xvelocity = 0
-        yvelocity = 0
+        ''' reset the bullet's attributes '''
+        self.xvelocity = 0
+        self.yvelocity = 0
         self.rect.top = screenheight * 3
         self.rect.left = screenwidth / 2
         

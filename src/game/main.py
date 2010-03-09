@@ -10,13 +10,18 @@ class Game:
     
     def __init__(self):
         pygame.init()
+        
+        ''' we don't use a mouse in this game so we hide it '''
+        pygame.mouse.set_visible(False)
 
         self.size = self.width, self.height = (1024, 768)
         self.black = 0, 0, 0
+        self.fontColor = (255,255,255)
         
         self.gameStarted = False
         self.gameOver = False
 
+        ''' set the display size and put it in fullscreen mode '''
         self.screen = pygame.display.set_mode(self.size, pygame.FULLSCREEN)
         
         ''' the font for the score board '''
@@ -117,6 +122,7 @@ class Game:
         elif event.key == pygame.K_RIGHT:
             self.travelRight = True
         elif event.key == pygame.K_SPACE:
+            ''' the space key also starts the game '''
             if self.gameOver:
                 self.gameOver = False
                 self.__reset()                
@@ -192,7 +198,10 @@ class Game:
                 ''' death code '''
                 self.player.death()
                 self.__doPlayerDeathAnimation()
+                ''' the game is over, end the update '''
+                return
         
+        ''' check for colisions between enemies and our bullets '''
         bulletstoreserve = []
         for e in self.enemylist:
             for b in self.playeractivebulletlist:
@@ -208,18 +217,20 @@ class Game:
         for o in self.obstaclelist:
             if o.rect.right < 0:
                 o.reset(self.width, self.height)
-                
+        
+        ''' move any bullets that are off screen to the reserve '''
         for b in self.playeractivebulletlist:
             if (b.rect.left > self.width):
                 bulletstoreserve.append(b) 
                 b.reset(self.width, self.height)
-                
+        
+        ''' move the active bullets over to inactive '''
         for b in bulletstoreserve:
             self.playerreservebulletlist.append(b)
             self.playeractivebulletlist.remove(b)
         
-        bulletstoreserve = []
-        
+        ''' move enemy bullets that are offscreen to the reserve list '''
+        bulletstoreserve = []        
         for b in self.enemyactivebulletlist:
             if (b.rect.right < 0):
                 bulletstoreserve.append(b)                
@@ -263,38 +274,42 @@ class Game:
         self.screen.blit(self.background, self.backgroundrect)
         
         if self.gameOver:
-            surfaceGameOverFont = self.gameOverFont.render("GAME OVER", True, (255,255,0))
+            ''' display game over '''
+            surfaceGameOverFont = self.gameOverFont.render("GAME OVER", True, self.fontColor)
             gameOverRect = surfaceGameOverFont.get_rect()
             gameOverRect.bottom = self.height / 2
             gameOverRect.left = (self.width - gameOverRect.width) / 2
             self.screen.blit(surfaceGameOverFont, gameOverRect)
             
-            surfaceGameOverScoreFont = self.gameOverScoreFont.render("Score: %d" % self.player.score, True, (255,255,0))
+            ''' display the player's score '''
+            surfaceGameOverScoreFont = self.gameOverScoreFont.render("Score: %d" % self.player.score, True, self.fontColor)
             gameOverScoreRect = surfaceGameOverScoreFont.get_rect()
             gameOverScoreRect.top = gameOverRect.bottom + 20
             gameOverScoreRect.left = (self.width - gameOverScoreRect.width) / 2
             self.screen.blit(surfaceGameOverScoreFont, gameOverScoreRect)
             
-            surfaceGameOverSpaceFont = self.gameOverSpaceForMainMenu.render("Hit Space to return to main menu", True, (255,255,0))
+            ''' display the hit space for main menu '''
+            surfaceGameOverSpaceFont = self.gameOverSpaceForMainMenu.render("Hit Space to return to main menu", True, self.fontColor)
             gameOverSpaceRect = surfaceGameOverSpaceFont.get_rect()
             gameOverSpaceRect.top = gameOverScoreRect.bottom + 20
             gameOverSpaceRect.left = (self.width - gameOverSpaceRect.width) / 2
             self.screen.blit(surfaceGameOverSpaceFont, gameOverSpaceRect)
             
+            ''' refresh the screen '''
             pygame.display.flip()
             return
         
         if not self.gameStarted:
             ''' only draw the click to start screen if the game is not started '''
             ''' draw the title '''
-            surfaceTitleFont = self.titleFont.render("Paradox", True, (255,255,0))
+            surfaceTitleFont = self.titleFont.render("Paradox", True, self.fontColor)
             titleRect = surfaceTitleFont.get_rect()
             titleRect.top = (self.height - titleRect.height) / 2
             titleRect.left = (self.width - titleRect.width) / 2
             self.screen.blit(surfaceTitleFont, titleRect)
             
             ''' draw the click to start message '''
-            surfaceSpaceToStart = self.spaceToStartFont.render("Hit Space to start", True, (255,255,0))
+            surfaceSpaceToStart = self.spaceToStartFont.render("Hit Space to start", True, self.fontColor)
             spaceRect = surfaceSpaceToStart.get_rect()
             spaceRect.top = titleRect.bottom + 20
             spaceRect.left = (self.width - spaceRect.width) / 2
@@ -314,6 +329,7 @@ class Game:
         ''' draw the player '''
         self.screen.blit(self.player.img, self.player.rect)
         
+        ''' draw the afterburn fire, if it is engaged '''
         if self.afterburn:
             afterburnRect = self.afterburnSurface.get_rect()
             afterburnRect.right = self.player.rect.left
@@ -326,12 +342,13 @@ class Game:
             self.screen.blit(o.img, o.rect)
             
         ''' draw the score '''
-        fontSurface = self.scoreFont.render("%d" % self.player.score, True, (255,255,0))
+        fontSurface = self.scoreFont.render("%d" % self.player.score, True, self.fontColor)
         fontRect = fontSurface.get_rect()
         fontRect.top = 0
         fontRect.left = (self.width - fontRect.width) / 2
         self.screen.blit(fontSurface, fontRect)
             
+        ''' refresh the display '''
         pygame.display.flip()
         
     def __doPlayerDeathAnimation(self):
@@ -347,9 +364,18 @@ class Game:
             self.screen.blit(self.fire, fireRect)
             pygame.display.flip()
             time.sleep(0.2)
-            
-        self.playGameOverSound()      
+
+        ''' play the game over sound '''
+        self.playGameOverSound()
         
+        ''' 
+        clear the event list
+        this is to prevent the game to returning the main menu
+        if the player presses the space bar during the death animation 
+        '''        
+        pygame.event.clear()      
+        
+        ''' change the game state variables '''
         self.gameStarted = False
         self.gameOver = True
          
@@ -393,12 +419,15 @@ class Game:
         self.travelUp = False
         self.travelDown = False
         
+        ''' shooting and afterburn '''
         self.shooting = False
         self.afterburn = False
         
+        ''' reset the enemies '''
         for e in self.enemylist:
             e.reset(self.width, self.height)
-            
+        
+        ''' move all the active bullets into the reserve '''    
         playerbulletstoreserve = []
         enemybulletstoreserve = []
             
@@ -415,7 +444,8 @@ class Game:
         for b in enemybulletstoreserve:
             self.enemyreservebulletlist.append(b)
             self.enemyactivebulletlist.remove(b)
-            
+        
+        ''' reset the position of the reserve bullets '''    
         for b in self.playerreservebulletlist:
             b.reset(self.width, self.height)
             
@@ -427,14 +457,17 @@ class Game:
 
 if __name__ == '__main__':
     
-    game = Game()
+    game = Game()    
     
+    ''' the main game loop '''
     while 1:
+        ''' the game is exited by pressing the escape key '''
         key = pygame.key.get_pressed()
         
         if key[pygame.K_ESCAPE]:            
             pygame.event.post(pygame.event.Event(pygame.QUIT))
-                
+        
+        ''' handle events, sysexit and keyboard '''
         for event in pygame.event.get():
             if event.type == pygame.QUIT: 
                 sys.exit()
@@ -443,7 +476,12 @@ if __name__ == '__main__':
             elif event.type == pygame.KEYUP:
                 game.handleKeyUpEvent(event)
 
+        ''' update the game logic '''
         game.update()
-        game.draw()        
+        
+        ''' draw the updated game '''
+        game.draw()
+        
+        ''' sleep so the game doesn't run too fast '''        
         time.sleep(0.01)
                

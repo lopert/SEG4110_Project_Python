@@ -23,19 +23,12 @@ class Enemy(object):
         self.rect.left = -5000
         self.speed = speed
         
-    def shootRandom(self):
-        if (random.sample([0,1], 1) == 1):
-            self.shoot(self);
-            
-        
-    def shoot(self):
-        print "Imma firin mah lazah!"
-        #generate a bullet here
-        
     def movement(self):
+        ''' move the enemy's rectangle '''
         self.rect.left = self.rect.left - self.speed
         
     def reset(self, screenwidth, screenheight):
+        ''' reset the enemy offscreen with random height and speed '''
         self.rect.left = screenwidth + (self.rect.width * random.randint(1,4))
         self.rect.top = self.rect.height * random.randint(0, screenheight % self.rect.height) 
         self.speed = random.randint(10, 15)
