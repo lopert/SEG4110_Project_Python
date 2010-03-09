@@ -38,13 +38,13 @@ class Game:
         self.gameOverSpaceForMainMenu = pygame.font.Font(fontPath, 40)      
         
         ''' load the images '''
-        self.background = pygame.image.load("../../pictures/3D_Hot_Planet.jpg")        
-        self.playerImage = pygame.image.load("../../pictures/player_ship_resized.png")
-        self.alienUFOskin = pygame.image.load("../../pictures/ufo_resized.png")
-        self.laser = pygame.image.load("../../pictures/laser.png")
-        self.laserBall = pygame.image.load("../../pictures/laser_ball.png")
-        self.fire = pygame.image.load("../../pictures/cartoon_fire_resized.png")
-        self.afterburnSurface = pygame.image.load("../../pictures/afterburn.png")
+        self.background = pygame.image.load("pictures/3D_Hot_Planet.jpg")        
+        self.playerImage = pygame.image.load("pictures/player_ship_resized.png")
+        self.alienUFOskin = pygame.image.load("pictures/ufo_resized.png")
+        self.laser = pygame.image.load("pictures/laser.png")
+        self.laserBall = pygame.image.load("pictures/laser_ball.png")
+        self.fire = pygame.image.load("pictures/cartoon_fire_resized.png")
+        self.afterburnSurface = pygame.image.load("pictures/afterburn.png")
         
         ''' the background's rectangle '''
         self.backgroundrect = self.background.get_rect()
@@ -91,14 +91,14 @@ class Game:
         
         ''' load the sounds '''
         pygame.mixer.init()
-        self.afterburnSound = pygame.mixer.Sound("../../sounds/afterburn.ogg")
-        self.bigExplosionSound = pygame.mixer.Sound("../../sounds/big_explosion.ogg")
-        self.explosionSound = pygame.mixer.Sound("../../sounds/explosion.ogg")
-        self.gameOverSound = pygame.mixer.Sound("../../sounds/game_over.ogg")
-        self.pewSound = pygame.mixer.Sound("../../sounds/pew.ogg")
-        self.powSound = pygame.mixer.Sound("../../sounds/pow.ogg")
-        self.tinkSound = pygame.mixer.Sound("../../sounds/tink.ogg")
-        self.tuckSound = pygame.mixer.Sound("../../sounds/tink.ogg")
+        self.afterburnSound = pygame.mixer.Sound("sounds/afterburn.ogg")
+        self.bigExplosionSound = pygame.mixer.Sound("sounds/big_explosion.ogg")
+        self.explosionSound = pygame.mixer.Sound("sounds/explosion.ogg")
+        self.gameOverSound = pygame.mixer.Sound("sounds/game_over.ogg")
+        self.pewSound = pygame.mixer.Sound("sounds/pew.ogg")
+        self.powSound = pygame.mixer.Sound("sounds/pow.ogg")
+        self.tinkSound = pygame.mixer.Sound("sounds/tink.ogg")
+        self.tuckSound = pygame.mixer.Sound("sounds/tink.ogg")
 
         ''' movement directions '''
         self.travelLeft = False
