@@ -24,8 +24,13 @@ class Game:
         self.scoreFont = pygame.font.Font(fontPath, 30)
         
         ''' the font for the click to start '''
-        self.titleFont = pygame.font.Font(fontPath, 50)
-        self.clickToStartFont = pygame.font.Font(fontPath, 20)      
+        self.titleFont = pygame.font.Font(fontPath, 120)
+        self.clickToStartFont = pygame.font.Font(fontPath, 40)
+        
+        ''' the font for game over '''
+        self.gameOverFont = pygame.font.Font(fontPath, 120)
+        self.gameOverScoreFont = pygame.font.Font(fontPath, 60)
+        self.gameOverClickForMainMenu = pygame.font.Font(fontPath, 40)      
         
         ''' load the images '''
         self.background = pygame.image.load("3D_Hot_Planet.jpg")
@@ -35,9 +40,7 @@ class Game:
         self.laser = pygame.image.load("laser.png")
         self.laserBall = pygame.image.load("laser_ball.png")
         self.fire = pygame.image.load("cartoon_fire_resized.png")
-        
-        
-        
+           
         ''' Generate bullets '''
         self.playerreservebulletlist = []
         self.enemyreservebulletlist = []
@@ -48,9 +51,9 @@ class Game:
         for i in range(50):
             self.playerreservebulletlist.append(bullet.Bullet(self.playerbulletskin))
             
-        self.playerbulletskin = pygame.image.load("laser.png")
+        self.enemybulletskin = pygame.image.load("laser_ball.png")
         for i in range(50):
-            self.enemyreservebulletlist.append(bullet.Bullet(self.playerbulletskin))
+            self.enemyreservebulletlist.append(bullet.Bullet(self.enemybulletskin))
             
         ''' Generate enemy bullets '''
             
@@ -122,8 +125,12 @@ class Game:
             
     def handleMouseDownEvent(self, event):
         if event.button == 1:
+            if self.gameOver:
+                self.gameOver = False
+                return
             if not self.gameStarted:
                 self.gameStarted = True
+                return
         
             
     def update(self):
@@ -230,6 +237,28 @@ class Game:
         self.screen.fill(self.black)
         self.screen.blit(self.background, self.backgroundrect)
         
+        if self.gameOver:
+            surfaceGameOverFont = self.gameOverFont.render("GAME OVER", True, (255,255,0))
+            gameOverRect = surfaceGameOverFont.get_rect()
+            gameOverRect.bottom = self.height / 2
+            gameOverRect.left = (self.width - gameOverRect.width) / 2
+            self.screen.blit(surfaceGameOverFont, gameOverRect)
+            
+            surfaceGameOverScoreFont = self.gameOverScoreFont.render("Score: %d" % self.player.score, True, (255,255,0))
+            gameOverScoreRect = surfaceGameOverScoreFont.get_rect()
+            gameOverScoreRect.top = gameOverRect.bottom + 20
+            gameOverScoreRect.left = (self.width - gameOverScoreRect.width) / 2
+            self.screen.blit(surfaceGameOverScoreFont, gameOverScoreRect)
+            
+            surfaceGameOverClickFont = self.gameOverClickForMainMenu.render("Click to return to main menu", True, (255,255,0))
+            gameOverClickRect = surfaceGameOverClickFont.get_rect()
+            gameOverClickRect.top = gameOverScoreRect.bottom + 20
+            gameOverClickRect.left = (self.width - gameOverClickRect.width) / 2
+            self.screen.blit(surfaceGameOverClickFont, gameOverClickRect)
+            
+            pygame.display.flip()
+            return
+        
         if not self.gameStarted:
             ''' only draw the click to start screen if the game is not started '''
             ''' draw the title '''
@@ -275,6 +304,7 @@ class Game:
         
     def __doPlayerDeathAnimation(self):
         
+        self.draw()
         self.playBigExplosionSound()
         
         ''' generate a bunch of fires on the screen '''
