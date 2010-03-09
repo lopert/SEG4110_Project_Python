@@ -38,14 +38,16 @@ class Game:
         self.gameOverSpaceForMainMenu = pygame.font.Font(fontPath, 40)      
         
         ''' load the images '''
-        self.background = pygame.image.load("3D_Hot_Planet.jpg")
+        self.background = pygame.image.load("../../pictures/3D_Hot_Planet.jpg")        
+        self.playerImage = pygame.image.load("../../pictures/player_ship_resized.png")
+        self.alienUFOskin = pygame.image.load("../../pictures/ufo_resized.png")
+        self.laser = pygame.image.load("../../pictures/laser.png")
+        self.laserBall = pygame.image.load("../../pictures/laser_ball.png")
+        self.fire = pygame.image.load("../../pictures/cartoon_fire_resized.png")
+        self.afterburnSurface = pygame.image.load("../../pictures/afterburn.png")
+        
+        ''' the background's rectangle '''
         self.backgroundrect = self.background.get_rect()
-        self.playerImage = pygame.image.load("player_ship_resized.png")
-        self.alienUFOskin = pygame.image.load("ufo_resized.png")
-        self.laser = pygame.image.load("laser.png")
-        self.laserBall = pygame.image.load("laser_ball.png")
-        self.fire = pygame.image.load("cartoon_fire_resized.png")
-        self.afterburnSurface = pygame.image.load("afterburn.png")
 
         ''' the player's ship '''
         self.player = player.Player(self.playerImage)
