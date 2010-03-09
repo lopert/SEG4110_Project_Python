@@ -17,18 +17,26 @@ class Game:
 
         self.screen = pygame.display.set_mode(self.size, pygame.FULLSCREEN)
         
+        ''' the font for the score board '''
+        fontPath = pygame.font.match_font("Arial", True, False)
+        self.scoreFont = pygame.font.Font(fontPath, 30)       
+        
         ''' load the images '''
         self.background = pygame.image.load("3D_Hot_Planet.jpg")
         self.backgroundrect = self.background.get_rect()
 
         self.player = player.Player(pygame.image.load("player_ship_resized.png"))
         
-        self.alienUFOskin = pygame.image.load("ufo_resized.png");
+        self.alienUFOskin = pygame.image.load("ufo_resized.png")
+        
+        self.laser = pygame.image.load("laser.png")
         
         ''' Generate bullets '''
-        self.bulletlist = []
-        for i in range(20):
-            self.bulletlist.append(bullet.Bullet(0))
+        self.reservebulletlist = []
+        self.activebulletlist = []
+        self.bulletskin = pygame.image.load("laser.png")
+        for i in range(100):
+            self.reservebulletlist.append(bullet.Bullet(self.bulletskin))
         
         ''' Generate Enemies '''
         self.enemylist = []
@@ -42,12 +50,12 @@ class Game:
         
         ''' What can the player be killed by? '''
         self.obstaclelist = []        
-        for e in self.enemy:
-            self.obstacles.append(e)
+        for e in self.enemylist:
+            self.obstaclelist.append(e)
         
         self.obstaclerectlist = []
-        for o in self.obstacles:
-            self.obstaclerects.append(o.rect)
+        for o in self.obstaclelist:
+            self.obstaclerectlist.append(o.rect)
         
         ''' load the sounds '''
         pygame.mixer.init()
@@ -105,7 +113,7 @@ class Game:
             self.player.ySpeed -= 2
         if self.travelDown:
             self.player.ySpeed += 2
-        
+            
         ''' prevent the player from going off screen '''
         if self.player.rect.top + self.player.ySpeed < 0:
             self.player.ySpeed = 0
@@ -119,36 +127,78 @@ class Game:
         ''' move the player '''
         self.player.movement()
         
-        ''' move all obstacles their respective speeds and paths '''
-        for o in self.obstacles:
+        ''' move all obstaclelist their respective speeds and paths '''
+        for o in self.obstaclelist:
             o.movement()
+            
+        for b in self.activebulletlist:
+            b.movement()
         
         ''' check for collisions '''
-        if (self.player.rect.collidelist(self.obstaclerects) != -1):
+        if (self.player.rect.collidelist(self.obstaclerectlist) != -1):
                 ''' death code '''
                 self.player.death()
-                print "Death"
+                self.playBigExplosionSound()
         
         for e in self.enemylist:
-            if e.rect.collidelist(self.bulletlist):
-                ''' enemy death code '''
-                e.reset()
-                self.playExplosionSound()
+            for b in self.activebulletlist:
+                if (e.rect.colliderect(b.rect)):
+                    ''' enemy death code '''
+                    e.reset(self.width, self.height)
+                    b.reset()
+                    self.reservebulletlist.append(b)
+                    self.activebulletlist.remove(b)
+                    self.playExplosionSound()
                 
-        ''' reset any obstacles that have gone by '''
-        for o in self.obstacles:
+        ''' reset any obstaclelist that have gone by '''
+        for o in self.obstaclelist:
             if o.rect.right < 0:
                 o.reset(self.width, self.height)
+                
+        for b in self.activebulletlist:
+            if b.rect.left > self.width:
+                self.reservebulletlist.append(b)
+                self.activebulletlist.remove(b)
+                b.reset()
+                
+        ''' check if shooting '''
+        if self.shooting:
+            
+            bullet = self.reservebulletlist.pop(0)
+            self.activebulletlist.append(bullet)
+            bullet.rect.left = self.player.rect.right
+            bullet.rect.top = self.player.rect.top + (self.player.rect.height / 2)
+            bullet.velocity = 30
+            self.playPewSound()
+            self.shooting = False
+            
+                
+        ''' update the player score '''
+        self.player.score += 1
         
         
     def draw(self):
         ''' draw the scene '''
         self.screen.fill(self.black)
         self.screen.blit(self.background, self.backgroundrect)
+        
+        ''' draw the bullets '''
+        for b in self.activebulletlist:
+            self.screen.blit(b.img, b.rect)
 
+        ''' draw the player '''
         self.screen.blit(self.player.img, self.player.rect)
-        for o in self.obstacles:
+        
+        ''' draw the enemies '''
+        for o in self.obstaclelist:
             self.screen.blit(o.img, o.rect)
+            
+        ''' draw the score '''
+        fontSurface = self.scoreFont.render("%d" % self.player.score, True, (255,255,0))
+        fontRect = fontSurface.get_rect()
+        fontRect.top = 0
+        fontRect.left = (self.width - fontRect.width) / 2
+        self.screen.blit(fontSurface, fontRect)
             
         pygame.display.flip() 
     

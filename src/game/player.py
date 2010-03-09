@@ -16,7 +16,7 @@ class Player:
         '''
         Constructor
         '''
-        self.highScore = 0;
+        self.score = 0;
         self.img = surface
         self.rect = self.img.get_rect()
         self.rect.right = -1;
