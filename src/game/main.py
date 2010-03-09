@@ -40,6 +40,7 @@ class Game:
         self.laser = pygame.image.load("laser.png")
         self.laserBall = pygame.image.load("laser_ball.png")
         self.fire = pygame.image.load("cartoon_fire_resized.png")
+        self.afterburnSurface = pygame.image.load("afterburn.png")
 
         ''' Generate bullets '''
         self.playerreservebulletlist = []
@@ -48,11 +49,11 @@ class Game:
         self.enemyactivebulletlist = []
         
         self.playerbulletskin = pygame.image.load("laser.png")
-        for i in range(50):
+        for _ in range(50):
             self.playerreservebulletlist.append(bullet.Bullet(self.playerbulletskin))
             
         self.enemybulletskin = pygame.image.load("laser_ball.png")
-        for i in range(50):
+        for _ in range(50):
             self.enemyreservebulletlist.append(bullet.Bullet(self.enemybulletskin))
             
         ''' Generate enemy bullets '''
@@ -61,9 +62,9 @@ class Game:
         
         ''' Generate Enemies '''
         self.enemylist = []
-        self.enemylist.append(enemy.Enemy(self.alienUFOskin, 26))
-        self.enemylist.append(enemy.Enemy(self.alienUFOskin, 20))
-        self.enemylist.append(enemy.Enemy(self.alienUFOskin, 16))
+        self.enemylist.append(enemy.Enemy(self.alienUFOskin, 10))
+        self.enemylist.append(enemy.Enemy(self.alienUFOskin, 15))
+        self.enemylist.append(enemy.Enemy(self.alienUFOskin, 12))
         
         self.enemyrectlist = []
         for e in self.enemylist:
@@ -95,7 +96,12 @@ class Game:
         self.travelUp = False
         self.travelDown = False
         
-        self.shooting = False     
+        ''' shooting '''
+        self.shooting = False
+        
+        ''' afterburner '''
+        self.afterburn = False
+     
         
     def handleKeyDownEvent(self, event):
         ''' the arrow keys affect movement '''
@@ -109,6 +115,10 @@ class Game:
             self.travelRight = True
         elif event.key == pygame.K_SPACE:
             self.shooting = True
+        elif event.key == pygame.K_LALT:
+            if not self.afterburn:
+                self.afterburn = True
+                self.playAfterburnSound()
             
     def handleKeyUpEvent(self, event):
         ''' the arrow keys affect movement ''' 
@@ -122,11 +132,14 @@ class Game:
             self.travelRight = False
         elif event.key == pygame.K_SPACE:
             self.shooting = False
+        elif event.key == pygame.K_LALT:
+            self.afterburn = False
             
     def handleMouseDownEvent(self, event):
         if event.button == 1:
             if self.gameOver:
                 self.gameOver = False
+                self.__reset()
                 return
             if not self.gameStarted:
                 self.gameStarted = True
@@ -137,16 +150,20 @@ class Game:
         ''' don't do anything if the game is not started '''
         if not self.gameStarted:
             return
+        
+        acceleration = 1
+        if self.afterburn:
+            acceleration = 3
                
         ''' adjust the speeds '''
         if self.travelLeft:
-            self.player.xSpeed -= 2
+            self.player.xSpeed -= acceleration
         if self.travelRight:
-            self.player.xSpeed += 2
+            self.player.xSpeed += acceleration
         if self.travelUp:
-            self.player.ySpeed -= 2
+            self.player.ySpeed -= acceleration
         if self.travelDown:
-            self.player.ySpeed += 2
+            self.player.ySpeed += acceleration
             
         ''' prevent the player from going off screen '''
         if self.player.rect.top + self.player.ySpeed < 0:
@@ -224,7 +241,7 @@ class Game:
                 self.enemyactivebulletlist.append(bullet)
                 bullet.rect.right = e.rect.left
                 bullet.rect.top = e.rect.top + (e.rect.height / 2)
-                bullet.xvelocity = -35
+                bullet.xvelocity = -25
                 self.playPowSound()
             
                 
@@ -289,6 +306,13 @@ class Game:
         ''' draw the player '''
         self.screen.blit(self.player.img, self.player.rect)
         
+        if self.afterburn:
+            afterburnRect = self.afterburnSurface.get_rect()
+            afterburnRect.right = self.player.rect.left
+            afterburnRect.top = self.player.rect.top - 30
+            self.screen.blit(self.afterburnSurface, afterburnRect) 
+            
+        
         ''' draw the enemies '''
         for o in self.obstaclelist:
             self.screen.blit(o.img, o.rect)
@@ -316,9 +340,8 @@ class Game:
             pygame.display.flip()
             time.sleep(0.2)
             
-        self.playGameOverSound()
-                
-        self.__reset()
+        self.playGameOverSound()      
+        
         self.gameStarted = False
         self.gameOver = True
          
@@ -363,6 +386,7 @@ class Game:
         self.travelDown = False
         
         self.shooting = False
+        self.afterburn = False
         
         for e in self.enemylist:
             e.reset(self.width, self.height)
