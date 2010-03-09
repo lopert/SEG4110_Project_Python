@@ -12,10 +12,10 @@ class Game:
         pygame.init()
 
         self.size = self.width, self.height = (1024, 768)
-        self.speed = [0, 0]
         self.black = 0, 0, 0
         
         self.gameStarted = False
+        self.gameOver = False
 
         self.screen = pygame.display.set_mode(self.size, pygame.FULLSCREEN)
         
@@ -33,6 +33,7 @@ class Game:
         self.player = player.Player(pygame.image.load("player_ship_resized.png"))
         self.alienUFOskin = pygame.image.load("ufo_resized.png")
         self.laser = pygame.image.load("laser.png")
+        self.fire = pygame.image.load("cartoon_fire_resized.png")
         
         self.enemyone = enemy.Enemy(self.alienUFOskin, 43)
         self.enemytwo = enemy.Enemy(self.alienUFOskin, 20)
@@ -217,7 +218,17 @@ class Game:
         
     def playTuckSound(self):
         ''' play the tuck sound '''
-        self.tuckSound.play()  
+        self.tuckSound.play()
+        
+    def __reset(self):
+        ''' movement directions '''
+        self.travelLeft = False
+        self.travelRight = False
+        self.travelUp = False
+        self.travelDown = False
+        
+        self.shooting = False 
+          
 
 if __name__ == '__main__':
     
