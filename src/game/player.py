@@ -40,3 +40,10 @@ class Player:
        
        self.rect.left += self.xSpeed
        self.rect.top += self.ySpeed
+       
+    def reset(self):
+        self.score = 0;
+        self.ySpeed = 0;
+        self.xSpeed = 0;
+        self.rect.top = 0;
+        self.rect.left = 0;

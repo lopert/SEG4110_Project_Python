@@ -36,8 +36,6 @@ class Game:
         self.laserBall = pygame.image.load("laser_ball.png")
         self.fire = pygame.image.load("cartoon_fire_resized.png")
         
-        
-        
         ''' Generate bullets '''
         self.playerreservebulletlist = []
         self.enemyreservebulletlist = []
@@ -332,7 +330,22 @@ class Game:
         self.travelUp = False
         self.travelDown = False
         
-        self.shooting = False 
+        self.shooting = False
+        
+        for e in self.enemylist:
+            e.reset(self.width, self.height)
+            
+        for b in self.playeractivebulletlist:
+            b.reset(self.width, self.height)
+            self.playerreservebulletlist.append(b)
+            self.playeractivebulletlist.remove(b)
+            
+        for b in self.enemyactivebulletlist:
+            b.reset(self.width, self.height)
+            self.enemyreservebulletlist.append(b)
+            self.enemyactivebulletlist.remove(b)
+            
+        self.player.reset()
           
 
 if __name__ == '__main__':
